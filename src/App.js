@@ -22,6 +22,7 @@ class App extends Component {
     this.handleNewTodoTextChange = this.handleNewTodoTextChange.bind(this);
     this.handleCurrentTodoTextChange = this.handleCurrentTodoTextChange.bind(this);
     this.createTodo = this.createTodo.bind(this);
+    this.deleteTodo = this.deleteTodo.bind(this);
 
 
 
@@ -64,7 +65,19 @@ class App extends Component {
     });
   }
 
-
+deleteTodo(todoId) {
+    axios({
+      url: `/todos/${todoId}.json`,
+      baseURL: 'https://todo-d608a.firebaseio.com/',
+      method: 'DELETE'
+    }).then((response) => {
+      let todos = this.state.todos;
+      delete todos[todoId];
+      this.setState({todos: todos});
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
 
 
   handleNewTodoTextChange(event) {
@@ -112,6 +125,11 @@ class App extends Component {
             <h4>{todo.title}</h4>
             <div>{moment(todo.createdAt).calendar()}</div>
           </div>
+          <button
+      className="ml-4 btn btn-link"
+      onClick={() => { this.deleteTodo(todoId) }}>
+      <span aria-hidden="true">&times;</span>
+    </button>
 
         </div>
       );
