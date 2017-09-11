@@ -23,6 +23,7 @@ class App extends Component {
     this.handleCurrentTodoTextChange = this.handleCurrentTodoTextChange.bind(this);
     this.createTodo = this.createTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
+    this.selectTodo = this.selectTodo.bind(this);
 
 
 
@@ -33,7 +34,7 @@ class App extends Component {
   getTodos() {
     axios({
       url: '/todos.json',
-      baseURL: 'https://todo-d608a.firebaseio.com/',
+      baseURL: 'https://todo-list-app-6bd54.firebaseio.com/',
       method: 'GET'
     }).then((response) => {
       this.setState({todos: response.data});
@@ -52,7 +53,7 @@ class App extends Component {
 
     axios({
       url: '/todos.json',
-      baseURL: 'https://todo-d608a.firebaseio.com/',
+      baseURL: 'https://todo-list-app-6bd54.firebaseio.com/',
       method: 'POST',
       data: newTodo
     }).then((response) => {
@@ -68,7 +69,7 @@ class App extends Component {
 deleteTodo(todoId) {
     axios({
       url: `/todos/${todoId}.json`,
-      baseURL: 'https://todo-d608a.firebaseio.com/',
+      baseURL: 'https://todo-list-app-6bd54.firebaseio.com/',
       method: 'DELETE'
     }).then((response) => {
       let todos = this.state.todos;
@@ -90,7 +91,29 @@ deleteTodo(todoId) {
     this.setState({currentTodoText: event.target.value});
   }
 
+selectTodo(todoId) {
+    this.setState({
+      currentTodo: todoId,
+      currentTodoText: this.state.todos[todoId].title
+    });
+  }
+  renderSelectedTodo() {
+    let content;
 
+    if (this.state.currentTodo) {
+      let currentTodo = this.state.todos[this.state.currentTodo];
+      content = (
+        <form onSubmit={this.updateCurrentTodo}>
+          <input
+            className="w-100"
+            value={this.state.currentTodoText}
+            onChange={this.handleCurrentTodoTextChange} />
+        </form>
+      );
+    }
+
+    return content;
+  }
 
 
 
@@ -121,7 +144,7 @@ deleteTodo(todoId) {
 
       todoElements.push(
         <div className="todo d-flex justify-content-between pb-4" key={todoId}>
-          <div className="mt-2">
+          <div className="mt-2" onClick={() => this.selectTodo(todoId)}>
             <h4>{todo.title}</h4>
             <div>{moment(todo.createdAt).calendar()}</div>
           </div>
@@ -150,7 +173,9 @@ deleteTodo(todoId) {
             {this.renderNewTodoBox()}
             {this.renderTodoList()}
           </div>
-
+          <div className="col-6 px-4">
+            {this.renderSelectedTodo()}
+          </div>
         </div>
       </div>
     );
