@@ -24,12 +24,12 @@ class App extends Component {
     this.createTodo = this.createTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
     this.selectTodo = this.selectTodo.bind(this);
-
-
-
+    this.updateCurrentTodo = this.updateCurrentTodo.bind(this);
   }
 
-
+  componentDidMount() {
+    this.getTodos();
+  }
 
   getTodos() {
     axios({
@@ -66,7 +66,28 @@ class App extends Component {
     });
   }
 
-deleteTodo(todoId) {
+
+  updateCurrentTodo(event) {
+    event.preventDefault();
+
+    let id = this.state.currentTodo;
+    let todoData = {title: this.state.currentTodoText};
+
+    axios({
+      url: `/todos/${id}.json`,
+      baseURL: 'https://todo-list-app-6bd54.firebaseio.com/',
+      method: 'PATCH',
+      data: todoData
+    }).then((response) => {
+      let todos = this.state.todos;
+      todos[id].title = this.state.currentTodoText;
+      this.setState({todos: todos});
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
+
+  deleteTodo(todoId) {
     axios({
       url: `/todos/${todoId}.json`,
       baseURL: 'https://todo-list-app-6bd54.firebaseio.com/',
@@ -80,7 +101,6 @@ deleteTodo(todoId) {
     });
   }
 
-
   handleNewTodoTextChange(event) {
     event.preventDefault();
     this.setState({newTodoText: event.target.value});
@@ -91,12 +111,13 @@ deleteTodo(todoId) {
     this.setState({currentTodoText: event.target.value});
   }
 
-selectTodo(todoId) {
+  selectTodo(todoId) {
     this.setState({
       currentTodo: todoId,
       currentTodoText: this.state.todos[todoId].title
     });
   }
+
   renderSelectedTodo() {
     let content;
 
@@ -114,8 +135,6 @@ selectTodo(todoId) {
 
     return content;
   }
-
-
 
   renderNewTodoBox() {
     return (
@@ -149,11 +168,10 @@ selectTodo(todoId) {
             <div>{moment(todo.createdAt).calendar()}</div>
           </div>
           <button
-      className="ml-4 btn btn-link"
-      onClick={() => { this.deleteTodo(todoId) }}>
-      <span aria-hidden="true">&times;</span>
-    </button>
-
+            className="ml-4 btn btn-link"
+            onClick={() => { this.deleteTodo(todoId) }}>
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
       );
     }
@@ -183,3 +201,5 @@ selectTodo(todoId) {
 }
 
 export default App;
+
+
