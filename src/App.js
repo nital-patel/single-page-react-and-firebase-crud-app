@@ -18,13 +18,15 @@ class App extends Component {
     // If this doesn't make sense now, just wait until you implement the CREATE
     // feature. Then you will be able to view your data in the Firebase console
     // and it should all be clear.
-
+    this.handelChange = this.handelChange.bind(this);
+    this.handelSubmit = this.handelSubmit.bind(this);
     this.handleNewTodoTextChange = this.handleNewTodoTextChange.bind(this);
     this.handleCurrentTodoTextChange = this.handleCurrentTodoTextChange.bind(this);
     this.createTodo = this.createTodo.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
     this.selectTodo = this.selectTodo.bind(this);
-    this.updateCurrentTodo = this.updateCurrentTodo.bind(this);
+    this.handleNewTodoTextChange = this.handleNewTodoTextChange.bind(this);
+    this.updateCurrentTodo; = this.updateCurrentTodo.bind(this);
   }
 
   componentDidMount() {
@@ -42,14 +44,15 @@ class App extends Component {
       console.log(error);
     });
   }
-
+  createTodo() {
   createTodo(event) {
     event.preventDefault();
 
     let newTodo = {
       title: this.state.newTodoText,
       createdAt: new Date()
-    };
+    });
+}
 
     axios({
       url: '/todos.json',
@@ -100,18 +103,19 @@ class App extends Component {
       console.log(error);
     });
   }
-
+  handelSubmit(event) {
   handleNewTodoTextChange(event) {
     event.preventDefault();
     this.setState({newTodoText: event.target.value});
   }
-
+  handelChange(event) {
   handleCurrentTodoTextChange(event) {
     event.preventDefault();
     this.setState({currentTodoText: event.target.value});
   }
 
   selectTodo(todoId) {
+    this.setState({currentTodo: todoId});
     this.setState({
       currentTodo: todoId,
       currentTodoText: this.state.todos[todoId].title
@@ -124,6 +128,9 @@ class App extends Component {
     if (this.state.currentTodo) {
       let currentTodo = this.state.todos[this.state.currentTodo];
       content = (
+        <div>
+          <h1>{currentTodo.title}</h1>
+        </div>
         <form onSubmit={this.updateCurrentTodo}>
           <input
             className="w-100"
@@ -139,11 +146,13 @@ class App extends Component {
   renderNewTodoBox() {
     return (
       <div className="new-todo-box pb-2">
+        <form onSubmit={this.handelSubmit}>
         <form onSubmit={this.createTodo}>
           <input
             className="w-100"
             placeholder="What do you have to do?"
             value={this.state.newTodoText}
+            onChange={this.handelChange} />
             onChange={this.handleNewTodoTextChange} />
         </form>
       </div>
